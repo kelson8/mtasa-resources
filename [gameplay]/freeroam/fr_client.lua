@@ -2200,6 +2200,58 @@ addCommandHandler('ap', alphaCommand)
 
 addCommandHandler('kill', killLocalPlayer)
 
+-- Flying car
+-- Added by kelson8
+isFlying = false
+
+Cars = {}
+
+--## CAR IDs ##--
+
+-- Add this in below to only allow certain vehicles to fly.
+Cars[506] = true
+	
+function addFlight()
+	-- possibly use something like this.
+	--if guiCheckBoxGetSelected(getControl(wndMain, "flyingcars")) then
+	--local state = isWorldSpecialPropertyEnabled("aircars")
+	--local state = guiCheckBoxGetSelected(getControl(wndMain, 'flyon'))
+		if(isPedInVehicle(localPlayer)) then
+			if isWorldSpecialPropertyEnabled("aircars") then
+				--guiCheckBoxSetSelected(getControl(wndMain, 'flyon'), not state)
+				setWorldSpecialPropertyEnabled("aircars", false)
+				outputChatBox ("You disabled flying cars")
+				if isFlying then
+					removeEventHandler("onClientRender", root, checkFlight)
+				end
+				isFlying = false
+			else
+				--guiCheckBoxSetSelected(getControl(wndMain, 'flyon'), state)
+				setWorldSpecialPropertyEnabled ( "aircars", true )
+				outputChatBox ("You enabled flying cars")
+				if not isFlying then
+					addEventHandler("onClientRender", root, checkFlight)
+				end
+				isFlying = true
+			end
+		else
+			outputChatBox("You need a car for this to work!")
+		end
+	end
+
+function flyingCarsCheck()
+
+checkedBox = guiCreateCheckBox(20,30,150,20,"Flying Cars",true,false)
+uncheckedBox = guiCreateCheckBox(20,30,150,20,"Flying cars",false,false)
+
+	if(guiCheckBoxGetSelected(checkedBox))then
+		guiCheckBoxSetSelected(uncheckedBox,true)
+	else
+		guiCheckBoxSetSelected(checkedBox,true)
+	end
+end
+
+
 wndMain = {
 	'wnd',
 	text = 'FR GUI',
@@ -2209,6 +2261,9 @@ wndMain = {
 	controls = {
 		{'lbl', text='Local player'},
 		{'br'},
+		-- TODO Fix this to work as a checkbox instead of being a button.
+		{'btn', id='flyingcars', onclick=addFlight},
+		--{'chk', id='flyon', onClick=addFlight},
 		{'btn', id='kill', onclick=killLocalPlayer},
 		{'btn', id='skin', window=wndSkin},
 		{'btn', id='anim', window=wndAnim},
